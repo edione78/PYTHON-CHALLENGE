@@ -8,7 +8,7 @@ csv_file = os.path.join("../PyPoll/Resources/election_data.csv")
 # Open the election results and read the file
 # A list to capture the names of candidates
 candidates = []
-
+tracking_votes = {}
 # List the number of votes 
 num_votes = []
 
@@ -17,13 +17,6 @@ percent_votes = []
 
 # Count of number of votes 
 total_votes = 0
-#with open(file_to_load) as election_data:
-    #file_reader = csv.reader(election_data)
-    # Read header row.
-    #headers = (next(file_reader))
-    # Print each row in the CSV file.
-    #for row in file_reader:
-        #print(row)
 with open(csv_file, newline = "") as csvfile:
     csvreader = csv.reader(csvfile, delimiter = ",")
     csv_header = next(csvreader)
@@ -39,34 +32,48 @@ with open(csv_file, newline = "") as csvfile:
         name 
         '''
         if row[2] not in candidates:
-            candidates.append(row[2])
-            index = candidates.index(row[2])
-            num_votes.append(1)
+            #adding a candidate to a candidate arry if it is not there
+            candidates.append (row[2])
+            #initialize a candidate in the dictionnary with 0 votes 
+            tracking_votes [row[2]] = 0
         else:
-            index = candidates.index(row[2])
-            num_votes[index] += 1
+            tracking_votes[row[2]] += 1
+
     
     # Add to percent_votes list 
-    for votes in num_votes:
-        percentage = (votes/total_votes) * 100
-        percentage = round(percentage)
-        percentage = "%.1f%%" % percentage
-        percent_votes.append(percentage)
+    # for key in tracking_votes:
+    #     percentage = (tracking_votes[key]/total_votes) * 100
+    #     percentage = round(percentage)
+    #     percentage = "%.1f%%" % percentage
+    #     percent_votes.append(percentage)
     
     # Find the winning candidate
-    winner = max(num_votes)
-    index = num_votes.index(winner)
-    winning_candidate = candidates[index]
+    # winner = max(num_votes)
+    # index = num_votes.index(winner)
+    # winning_candidate = candidates[index]
 
 # Displaying results
 print("Election Results")
 print("--------------------------")
 print(f"Total Votes: {str(total_votes)}")
 print("--------------------------")
-for i in range(len(candidates)):
-    print(f"{candidates[i]}: {str(percent_votes[i])} ({str(num_votes[i])})")
+for key in tracking_votes:
+    print(f"{key}: {(tracking_votes[key]/total_votes):.2%} ({str(tracking_votes[key])})") 
 print("--------------------------")
-print(f"Winner: {winning_candidate}")
+index_dictionnary = 0
+winner = ""
+for key in   tracking_votes:
+    if index_dictionnary == 0:
+        max_votes = tracking_votes[key]
+        index_dictionnary += 1
+        winner = key
+    else:
+        index_dictionnary += 1
+        if tracking_votes[key] > max_votes:
+            max_votes = tracking_votes[key]
+            winner = key
+            
+print(f"Winner: {winner}")
 print("--------------------------")
 
 # Exporting to .txt file
@@ -76,10 +83,10 @@ line2 = "--------------------------"
 line3 = str(f"Total Votes: {str(total_votes)}")
 line4 = str("--------------------------")
 output.write('{}\n{}\n{}\n{}\n'.format(line1, line2, line3, line4))
-for i in range(len(candidates)):
-    line = str(f"{candidates[i]}: {str(percent_votes[i])} ({str(num_votes[i])})")
+for key in tracking_votes:
+    line = (f"{key}: {(tracking_votes[key]/total_votes):.2%} ({str(tracking_votes[key])})") 
     output.write('{}\n'.format(line))
 line5 = "--------------------------"
-line6 = str(f"Winner: {winning_candidate}")
+line6 = str(f"Winner: {winner}")
 line7 = "--------------------------"
-#output.write('{}\n{}\n{}\n'.format(line5, line6, line7)) python main.py
+output.write('{}\n{}\n{}\n'.format(line5, line6, line7)) 
